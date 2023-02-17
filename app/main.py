@@ -29,7 +29,7 @@ html = """
         <ul id='messages'>
         </ul>
         <script>
-            var ws = new WebSocket("ws://localhost:8000/metrics");
+            var ws = new WebSocket("ws://{{host}}/metrics");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
@@ -51,7 +51,7 @@ html = """
 
 @app.get("/")
 async def get():
-    return HTMLResponse(html)
+    return HTMLResponse(html.replace("{{host}}", settings.HOST))
 
 
 @app.websocket("/metrics")
