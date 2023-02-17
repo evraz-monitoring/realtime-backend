@@ -29,7 +29,7 @@ html = """
         <ul id='messages'>
         </ul>
         <script>
-            var ws = new WebSocket("ws://{{host}}/metrics");
+            var ws = new WebSocket("ws://{{host}}/metrics/");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
