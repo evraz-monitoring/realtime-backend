@@ -64,11 +64,12 @@ COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 # quicker install as runtime deps are already installed
 RUN poetry install
 
+COPY ./app /app/
 # will become mountpoint of our code
 WORKDIR /app
 
 EXPOSE 8000
-CMD ["uvicorn", "--reload", "main:app"]
+CMD ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "--reload", "main:app"]
 
 
 # `production` image used for runtime
@@ -77,4 +78,4 @@ ENV FASTAPI_ENV=production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 COPY ./app /app/
 WORKDIR /app
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "main:app"]
