@@ -93,6 +93,8 @@ async def chatroom_ws_sender(ws: WebSocket, r: Redis):
             if message:
                 message = message["data"].decode("utf-8")
                 await ws.send_json(json.loads(message))
+            else:
+                await asyncio.sleep(settings.CHECK_DELAY)
     except Exception as exc:
         # TODO this needs handling better
         logger.error(exc)
