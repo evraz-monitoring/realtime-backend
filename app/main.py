@@ -79,7 +79,6 @@ async def chatroom_ws_receiver(ws: WebSocket, r: Redis):
             message = await ws.receive_text()
             if message:
                 await r.publish(settings.METRICS_STREAM, message)
-                logger.debug("RECEIVE FROM CLIENT %s", message.encode("utf-8"))
     except WebSocketDisconnect as exc:
         # TODO this needs handling better
         logger.error(exc)
@@ -92,7 +91,6 @@ async def chatroom_ws_sender(ws: WebSocket, r: Redis):
         while True:
             message = await p.get_message(ignore_subscribe_messages=True)
             if message:
-                logger.debug("RECEIVE FROM REDIS %s", message)
                 message = message["data"].decode("utf-8")
                 await ws.send_json(json.loads(message))
     except Exception as exc:
