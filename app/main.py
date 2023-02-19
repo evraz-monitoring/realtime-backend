@@ -8,7 +8,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 from redis.asyncio.client import Redis
 
 import settings
-from app.alerts import get_signals
+from alerts import get_signals
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
