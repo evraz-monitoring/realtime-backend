@@ -8,6 +8,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 from redis.asyncio.client import Redis
 
 import settings
+from app.alerts import get_signals
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -93,6 +94,8 @@ async def chatroom_ws_sender(ws: WebSocket, r: Redis):
             if message:
                 message = message["data"].decode("utf-8")
                 await ws.send_json(json.loads(message))
+                for alert in get_signals(message):
+                    await ws.send_json(alert)
             else:
                 await asyncio.sleep(settings.CHECK_DELAY)
     except Exception as exc:
