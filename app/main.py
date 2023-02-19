@@ -94,7 +94,7 @@ async def chatroom_ws_sender(ws: WebSocket, r: Redis):
             if message:
                 message = message["data"].decode("utf-8")
                 await ws.send_json(json.loads(message))
-                for alert in get_signals(message):
+                for alert in get_signals(json.loads(message)):
                     await ws.send_json(alert)
             else:
                 await asyncio.sleep(settings.CHECK_DELAY)
