@@ -13,6 +13,9 @@ before_script:
 
 build:
   stage: build
+  only:
+    refs:
+      - dev
   script:
     - docker pull $CI_REGISTRY_IMAGE:latest || true
     - docker build --cache-from $CI_REGISTRY_IMAGE:latest --target production --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:latest .
