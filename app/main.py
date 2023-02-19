@@ -29,7 +29,7 @@ html = """
         <ul id='messages'>
         </ul>
         <script>
-            var ws = new WebSocket("ws://localhost:8000/metrics");
+            var ws = new WebSocket("{{ws_protocol}}://{{host}}/metrics");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
@@ -51,7 +51,11 @@ html = """
 
 @app.get("/")
 async def get():
-    return HTMLResponse(html)
+    return HTMLResponse(
+        html.replace("{{host}}", settings.HOST).replace(
+            "{{ws_protocol}}", settings.WS_PROTOCOL
+        )
+    )
 
 
 @app.websocket("/metrics")
@@ -75,7 +79,6 @@ async def chatroom_ws_receiver(ws: WebSocket, r: Redis):
             message = await ws.receive_text()
             if message:
                 await r.publish(settings.METRICS_STREAM, message)
-                logger.debug("RECEIVE FROM CLIENT %s", message.encode("utf-8"))
     except WebSocketDisconnect as exc:
         # TODO this needs handling better
         logger.error(exc)
@@ -88,9 +91,10 @@ async def chatroom_ws_sender(ws: WebSocket, r: Redis):
         while True:
             message = await p.get_message(ignore_subscribe_messages=True)
             if message:
-                logger.debug("RECEIVE FROM REDIS %s", message)
                 message = message["data"].decode("utf-8")
                 await ws.send_json(json.loads(message))
+            else:
+                await asyncio.sleep(settings.CHECK_DELAY)
     except Exception as exc:
         # TODO this needs handling better
         logger.error(exc)
