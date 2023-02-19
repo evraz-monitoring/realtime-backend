@@ -35,6 +35,7 @@ def get_signals(message):
             yield {
                 "type": alert_type,
                 "metric": metric_name,
+                "exhauster": exhauster["exhauster"]
             }
 
 
